@@ -1,3 +1,8 @@
+
+/*
+   Written by depsterr in team enhance for the 2019 x-mas ctf emu challange
+*/
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
