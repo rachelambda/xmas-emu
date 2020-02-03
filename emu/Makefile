@@ -1,6 +1,9 @@
-CC=C99
+CC=c99
 
 default: emu.out
 
-emu.out: emu.c
-	gcc $^ -o $@
+clean:
+	rm *.out
+
+%.out: %.c
+	$(CC) $^ -o $@

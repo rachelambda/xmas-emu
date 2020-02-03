@@ -7,6 +7,6 @@ The emulator runs instructions till a print command is hit at which it prints th
 
 There are also some args that you can put into it (look at emu.c for the details) as well as info about the process being printed as it runs instructions.
 
-## Why upload this now?
+## Why is this on GitHub?
 
-I've choosen to put this on github now as I plan on writing an assembler for it to learn more about assemblers and string managment in c.
+I've chosen to put this on GitHub now as I plan on writing an assembler for it to learn more about assemblers and string management in c.
