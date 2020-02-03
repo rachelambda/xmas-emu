@@ -1,7 +1,5 @@
 #define byte unsigned char
 #define word unsigned short
-#define NOARG (Arg)0
-#define NOLINE (Line)0
 #define ARGLEN(op) (4 - op.len)
 #define HASARG(op) ARGLEN(op)
 
@@ -15,6 +13,7 @@ typedef struct Line {
 /* Label struct */
 typedef struct Label {
 	char name[64];
+	int line;
 	unsigned ptr : 12; 
 } Label;
 	

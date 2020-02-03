@@ -20,20 +20,22 @@ unsigned int lblen = 0;
 
 /* Rom to write to file */
 byte romb[0xEFF];
+unsigned short romsize = 0;
 
 int
 addoperation(Operation op)
 {
 	oplen++;
 	opsize += sizeof(Operation);
-		if (oplen > 0xEFF)
-			puts("program instructions too large for memory, aborting");
-			exit(-1);
-		}
-	if (realloc(opbuffer, opsize))
-		return 1;
-	else
+	if (oplen > 0xEFF) {
+		puts("program instructions too large for memory, aborting");
+		exit(-1);
+	}
+	if (!realloc(opbuffer, opsize))
 		return 0;
+
+	opbuffer[oplen - 1] = op;
+	return 1;
 }
 
 int
@@ -41,10 +43,11 @@ addlabel(Label lb)
 {
 	lblen++;
 	lbsize += sizeof(Operation);
-	if (realloc(lbbuffer, lbsize))
-		return 1;
-	else
+	if (!realloc(lbbuffer, lbsize))
 		return 0;
+
+	lbbuffer[lblen - 1] = lb;
+	return 1;
 }
 
 int
@@ -94,10 +97,12 @@ main (int argc, char **argv)
 	Line line;
 	int lines;
 	byte c = 0;
-	for(lines = 0;; lines++) {
+	byte ef = 0;
+	for(lines = 1;; lines++) {
 		/* Read one line */
 
-		line = NOLINE;
+		memset(line.str, 0x0, 64);
+		line.words = 0;
 		/* Check if it's a label by checking for whitespace */
 		if ((inb[c] == ' ' || inb[c] == '\t') && inb[c - 1] == '\n')
 			line.islabel = 0;
@@ -110,7 +115,7 @@ main (int argc, char **argv)
 			/* Filter whitespace */
 			if (!((inb[c] == ' ' || inb[c] == '\t') && inb[c + 1] == (' ' || inb[c + 1] == '\t'))) {
 				/* Copy over the string */
-				line.str[i] = inb[c];
+				line.str[index] = inb[c];
 				index++;
 				finwh = 0;
 			} else if (finwh = 0) {
@@ -121,8 +126,30 @@ main (int argc, char **argv)
 
 		/* Interpret line */
 
+		if (line.words == 0)
+			continue;
+
+		if (line.islabel == 1) {
+			if (line.words != 1) {
+				printf("label at line %d multiple", lines);
+				ef = 1; /* Error flag instead of exiting to make sure that you can see all errors */
+				Label newlabel = { .line = lines, .ptr = (romsize + 2) };
+				strcpy(newlabel.name, line.str);
+				addlabel(newlabel);
+			}
+		} else { 
+			if (line.words < 2) {
+				printf("instruction at line %d has too few words", lines);
+				ef = 1;
+			}
+		}
+
+
 		/* Check if there are no more lines */
 	}
+
+	if (ef)
+		exit(-1);
 
 	/* Exit with sucess code */
 	exit(0);
