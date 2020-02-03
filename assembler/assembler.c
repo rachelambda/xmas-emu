@@ -18,6 +18,9 @@ Label *lbbuffer = NULL;
 unsigned int lbsize = 0;
 unsigned int lblen = 0;
 
+/* Rom to write to file */
+byte romb[0xEFF];
+
 int
 addoperation(Operation op)
 {
@@ -88,8 +91,33 @@ main (int argc, char **argv)
 	}
 
 	/* Read and interpret the input buffer */
-	for(Line line;;) {
+	Line line;
+	int lines;
+	byte c = 0;
+	for(lines = 0;; lines++) {
 		/* Read one line */
+
+		line = NOLINE;
+		/* Check if it's a label by checking for whitespace */
+		if ((inb[c] == ' ' || inb[c] == '\t') && inb[c - 1] == '\n')
+			line.islabel = 0;
+		else
+			line.islabel = 1;
+		/* Used for removing whitespace */
+		byte finwh = 0;
+		byte index = 0;
+		for (;inb[c] != '\n'; c++){
+			/* Filter whitespace */
+			if (!((inb[c] == ' ' || inb[c] == '\t') && inb[c + 1] == (' ' || inb[c + 1] == '\t'))) {
+				/* Copy over the string */
+				line.str[i] = inb[c];
+				index++;
+				finwh = 0;
+			} else if (finwh = 0) {
+				finwh = 1;
+				line.words++;
+			}
+		}
 
 		/* Interpret line */
 

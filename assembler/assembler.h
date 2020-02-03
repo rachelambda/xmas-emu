@@ -1,6 +1,7 @@
 #define byte unsigned char
 #define word unsigned short
 #define NOARG (Arg)0
+#define NOLINE (Line)0
 #define ARGLEN(op) (4 - op.len)
 #define HASARG(op) ARGLEN(op)
 
