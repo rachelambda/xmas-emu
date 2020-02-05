@@ -93,12 +93,17 @@ main (int argc, char **argv)
 		fclose(infp);
 	}
 
+	printf("read %d charachters of assembler, interpreting\n", inl); 
+
 	/* Read and interpret the input buffer */
 	Line line;
 	int lines;
-	byte c = 0;
+	long c = 0;
 	byte ef = 0;
-	for(lines = 1;; lines++) {
+	byte b = 0;
+	for(lines = 1; c < inl; lines++) {
+		printf("Processing line %d\n", lines);
+		printf("Char: %d\n", c);
 		/* Read one line */
 
 		memset(line.str, 0x0, 64);
@@ -122,7 +127,18 @@ main (int argc, char **argv)
 				finwh = 1;
 				line.words++;
 			}
+			/* If going for too long */
+			if (c >= inl) {
+				b = 1;
+				break;
+			}
+
 		}
+		c++; /* Go from the whitespace for the next loop */
+
+		/* If going for too long */
+		if (b)
+			break;
 
 		/* Interpret line */
 
@@ -133,20 +149,104 @@ main (int argc, char **argv)
 			if (line.words != 1) {
 				printf("label at line %d multiple", lines);
 				ef = 1; /* Error flag instead of exiting to make sure that you can see all errors */
-				Label newlabel = { .line = lines, .ptr = (romsize + 2) };
-				strcpy(newlabel.name, line.str);
-				addlabel(newlabel);
 			}
+			Label newlabel = { .line = lines, .ptr = (oplen * 2) };
+			strcpy(newlabel.name, line.str);
+			addlabel(newlabel);
 		} else { 
-			if (line.words < 2) {
+			int arg;
+			char instr[8];
+			sscanf(line.str, "%s, %x", &instr, &arg);
+			if (line.words != 2) {
 				printf("instruction at line %d has too few words", lines);
 				ef = 1;
 			}
+
+			if (strcmp(instr, "ADD")) {
+				Operation op = ADD;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "LDA")) {
+				Operation op = LDA;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "XOR")) {
+				Operation op = XOR;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "OR")) {
+				Operation op = OR;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "AND")) {
+				Operation op = AND;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PLDA")) {
+				Operation op = PLDA;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PXOR")) {
+				Operation op = PXOR;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PLDA")) {
+				Operation op = PLDA;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "SOUT")) {
+				Operation op = SOUT;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "JMP")) {
+				Operation op = JMP;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "JE")) {
+				Operation op = JE;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "JL")) {
+				Operation op = JL;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "JG")) {
+				Operation op = JG;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "CMP")) {
+				Operation op = CMP;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PCMP")) {	
+				Operation op = PCMP;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "BEEF")) {	
+				Operation op = BEEF;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PBLOCK")) {	
+				Operation op = PBLOCK;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PUBLOCK")) {	
+				Operation op = PUBLOCK;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "PFROB")) {	
+				Operation op = PFROB;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			} else if (strcmp(instr, "NOP")) {	
+				Operation op = NOP;
+				op.argument.dnibble = arg;
+				addoperation(op);
+			}
 		}
-
-
-		/* Check if there are no more lines */
 	}
+
+	/* For loop for writing operations to binary */
 
 	if (ef)
 		exit(-1);

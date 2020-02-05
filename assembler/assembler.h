@@ -1,5 +1,6 @@
 #define byte unsigned char
 #define word unsigned short
+#define NOARG { .tnibble = 0 }
 #define ARGLEN(op) (4 - op.len)
 #define HASARG(op) ARGLEN(op)
 
@@ -25,9 +26,9 @@ typedef union Arg {
 
 /* Struct to use for each operation */
 typedef struct Operation {
-	byte len; /* length in nibbles */
 	short opcode; /* the opcode */
 	Arg argument; /* the argument here */
+	byte len; /* length of the instruction in nibbles */
 } Operation;
 
 /* Template operations that will be used in the program by intializing to these and changing args */
