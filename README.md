@@ -6,7 +6,3 @@ This is a simple emulator I wrote for my team [enhance](https://ctftime.org/team
 The emulator runs instructions till a print command is hit at which it prints the char to the terminal and a log file. After you enter a character here it will run to the next print, unless you enter s in which case you will go into step mode where the program reads a char for each instruction.
 
 There are also some args that you can put into it (look at emu.c for the details) as well as info about the process being printed as it runs instructions.
-
-## Why is this on GitHub?
-
-I've chosen to put this on GitHub now as I plan on writing an assembler for it to learn more about assemblers and string management in c.
